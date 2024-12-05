@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>thoughtful.ai - AI-Powered Comment Assistant</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Base Styles */
+        :root {
+            --blue-gradient: linear-gradient(to right, #3b82f6, #8b5cf6);
+            --dark-bg: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.5);
+            --border-color: #334155;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background: var(--dark-bg);
+            color: rgb(255, 255, 255);
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        /* Navigation */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 50;
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav-content {
+            height: 4rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: var(--blue-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--blue-gradient);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding-top: 8rem;
+            padding-bottom: 6rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            max-width: 48rem;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            background: var(--blue-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: #94a3b8;
+            margin-bottom: 2rem;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .comment-system {
+        max-width: 800px; /* 전체 화면에서 적절한 너비 설정 */
+        margin: 0 auto; /* 화면 중앙 정렬 */
+        padding: 1rem; /* 상하좌우 여백 */
+        background: rgba(255, 255, 255, 0.05); /* 약간의 배경 색상 추가 */
+        border-radius: 8px; /* 모서리 둥글게 */
+        border: 1px solid rgba(255, 255, 255, 0.1); /* 테두리 추가 */
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
+        }
+
+
+
+            
+        .avatar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px; /* 고정된 크기 */
+            height: 40px; /* 고정된 크기 */
+            border-radius: 50%;
+            background: #0a66c2; /* 아바타 배경색 */
+            color: white; /* 아이콘 색상 */
+            font-size: 20px; /* 아이콘 크기 */
+        }
+
+        .comment-input-trigger {
+            flex: 1; /* 버튼이 남은 공간을 채움 */
+            border: 1px solid rgba(0, 0, 0, 0.3); /* 테두리 */
+            border-radius: 20px; /* 둥근 모서리 */
+            padding: 12px 16px; /* 버튼 내부 여백 */
+            color: #666; /* 텍스트 색상 */
+            background: transparent; /* 투명 배경 */
+            text-align: left; /* 텍스트 왼쪽 정렬 */
+            cursor: pointer; /* 포인터 커서 */
+            transition: all 0.2s ease; /* 호버 효과 */
+        }
+
+        .comment-input-trigger:hover {
+            background: rgba(10, 102, 194, 0.1); /* 호버 시 배경 색상 */
+        }
+
+
+        .comment-editor {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 16px;
+            display: none;
+            border: 1px solid rgba(0,0,0,0.08);
+        }
+
+        .editor-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .step-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .step {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #e0e0e0;
+            color: #666;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .step.active {
+            background: #0a66c2;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .step-divider {
+            width: 40px;
+            height: 2px;
+            background: #e0e0e0;
+        }
+
+        .step-label {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .draft-status {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .editor-content {
+            margin-bottom: 16px;
+        }
+
+        .question {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #1a1a1a;
+        }
+
+        .context {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 16px;
+            padding: 12px;
+            background: #f9f9f9;
+            border-radius: 4px;
+            border-left: 3px solid #0a66c2;
+        }
+
+        .textarea-wrapper {
+            position: relative;
+            margin-bottom: 8px;
+        }
+
+        .comment-textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 16px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            resize: vertical;
+            font-size: 14px;
+            line-height: 1.5;
+            transition: all 0.2s ease;
+        }
+
+        .comment-textarea:focus {
+            outline: none;
+            border-color: #0a66c2;
+            box-shadow: 0 0 0 2px rgba(10,102,194,0.1);
+        }
+
+        .char-count {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            font-size: 12px;
+            color: #666;
+            background: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            pointer-events: none;
+        }
+
+        .ai-suggestions {
+            margin-top: 16px;
+        }
+
+        .suggestions-header {
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .suggestion-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .suggestion-chip {
+            padding: 6px 12px;
+            background: #f0f7ff;
+            color: #0a66c2;
+            border-radius: 16px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+
+        .suggestion-chip:hover {
+            background: #0a66c2;
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .editor-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .action-left {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 16px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+            border: none;
+        }
+
+        .btn-secondary {
+            background: #f3f2ef;
+            color: #666;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .btn-primary {
+            background: #0a66c2;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #004182;
+        }
+
+        .btn-outline {
+            background: white;
+            color: #0a66c2;
+            border: 1px solid #0a66c2;
+        }
+
+        .btn-outline:hover {
+            background: #f0f7ff;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 4px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            animation: slideIn 0.3s ease;
+            z-index: 1000;
+        }
+
+        .notification.success {
+            background: #ecfdf3;
+            color: #027a48;
+        }
+
+        .notification.error {
+            background: #fef3f2;
+            color: #b42318;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .comment-trigger {
+            display: flex;
+            align-items: center; /* 수직 정렬 */
+            justify-content: center; /* 수평 정렬 */
+            gap: 12px; /* 아바타와 버튼 사이 간격 */
+            background: white; /* 배경색 */
+            padding: 16px; /* 내부 여백 */
+            border-radius: 8px; /* 모서리 둥글게 */
+            margin-bottom: 16px; /* 하단 여백 */
+            border: 1px solid rgba(0, 0, 0, 0.08); /* 테두리 */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 그림자 */
+            max-width: 800px; /* 전체 컨테이너 너비 제한 */
+            margin: 0 auto; /* 중앙 정렬 */
+        }
+
+
+        .comments-list {
+            margin-top: 24px;
+        }
+
+        .comment {
+            background: white;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(0,0,0,0.08);
+        }
+
+        .comment-header {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .comment-info {
+            flex: 1;
+        }
+
+        .comment-author {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .comment-meta {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .comment-text {
+            font-size: 14px;
+            line-height: 1.5;
+            color: #1a1a1a;
+        }
+
+
+        /* Preview Section */
+        .preview-section {
+            display: none;
+            padding: 2rem;
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 1rem;
+            margin-top: 2rem;
+        }
+
+        .preview-section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .preview-content {
+            white-space: pre-wrap;
+            color: #94a3b8;
+            margin-bottom: 1.5rem;
+        }
+
+        .preview-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        /* Video Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 100;
+            padding: 2rem;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            width: 100%;
+            max-width: 800px;
+            background: var(--dark-bg);
+            border-radius: 1rem;
+            overflow: hidden;
+        }
+
+        .video-container {
+            position: relative;
+            padding-top: 56.25%;
+        }
+
+        .video-container video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            color: white;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Analytics Section Styles */
+.analytics-section {
+    padding: 6rem 0;
+    background: rgba(15, 23, 42, 0.3);
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.section-title {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    background: var(--blue-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.section-subtitle {
+    color: #94a3b8;
+    font-size: 1.1rem;
+}
+
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+.metric-card {
+    background: rgba(30, 41, 59, 0.5);
+    border: 1px solid var(--border-color);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    text-align: center;
+    transition: transform 0.2s ease;
+}
+
+.metric-card:hover {
+    transform: translateY(-5px);
+}
+
+.metric-icon {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    background: var(--blue-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.metric-number {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.metric-label {
+    color: #94a3b8;
+    margin-bottom: 1rem;
+}
+
+.metric-trend {
+    font-size: 0.875rem;
+    color: #10B981;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.chart-container {
+    background: rgba(30, 41, 59, 0.5);
+    border: 1px solid var(--border-color);
+    border-radius: 1rem;
+    padding: 1.5rem;
+}
+
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.chart-period {
+    background: rgba(15, 23, 42, 0.5);
+    border: 1px solid var(--border-color);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+}
+
+/* Testimonials Section Styles */
+.testimonials-section {
+    padding: 6rem 0;
+}
+
+.testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.testimonial-card {
+    background: rgba(30, 41, 59, 0.5);
+    border: 1px solid var(--border-color);
+    border-radius: 1rem;
+    padding: 2rem;
+    transition: transform 0.2s ease;
+}
+
+.testimonial-card:hover {
+    transform: translateY(-5px);
+}
+
+.testimonial-content {
+    position: relative;
+    margin-bottom: 2rem;
+}
+
+.testimonial-content i {
+    font-size: 1.5rem;
+    color: #3b82f6;
+    margin-bottom: 1rem;
+}
+
+.testimonial-content p {
+    color: #94a3b8;
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+.testimonial-author {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.author-image i {
+    font-size: 3rem;
+    color: #3b82f6;
+}
+
+.author-info h4 {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.author-info p {
+    color: #94a3b8;
+    font-size: 0.875rem;
+}
+
+
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="container nav-content">
+            <div class="logo">thoughtful.ai</div>
+            <div class="nav-buttons">
+                <button class="btn btn-secondary">Login</button>
+                
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1>Elevate Your Comments with AI</h1>
+                <p>Transform your thoughts into meaningful conversations with our AI-powered 
+                   comment assistant that understands context and guides your responses.</p>
+                <div class="hero-buttons">
+                    <button class="btn btn-primary">
+                        Add to Chrome <i class="fas fa-arrow-right"></i>
+                    </button>
+                    <button class="btn btn-secondary" id="openVideo">
+                        Watch Demo <i class="fas fa-play"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+      <!-- Comment Section -->
+    <div class="comment-system">
+        <!-- Comment Trigger -->
+        <div class="comment-trigger">
+            <div class="avatar">
+                <i class="fas fa-user"></i>
+            </div>
+            <button class="comment-input-trigger" onclick="showCommentEditor()">
+                댓글을 입력하세요...
+            </button>
+        </div>
+
+        <!-- Comment Editor -->
+        <div class="comment-editor" id="commentEditor">
+            <div class="editor-header">
+                <div class="step-indicator">
+                    <div class="step active">1</div>
+                    <div class="step-divider"></div>
+                    <div class="step">2</div>
+                    <div class="step-divider"></div>
+                    <div class="step">3</div>
+                </div>
+                <div class="draft-status">자동 저장됨</div>
+            </div>
+
+            <div class="editor-content">
+                <div class="question" id="currentQuestion"></div>
+                <div class="context" id="currentContext"></div>
+                <div class="textarea-wrapper">
+                    <textarea 
+                        class="comment-textarea" 
+                        id="commentInput" 
+                        placeholder="여기에 답변을 입력하세요..."
+                    ></textarea>
+                    <div class="char-count">0/1000</div>
+                </div>
+
+                <div class="ai-suggestions">
+                    <div class="suggestions-header">
+                        <i class="fas fa-lightbulb"></i>
+                        AI 추천 답변
+                    </div>
+                    <div class="suggestion-chips" id="suggestionChips"></div>
+                </div>
+            </div>
+
+            <div class="editor-actions">
+                <div class="action-left">
+                    <button class="btn btn-secondary" onclick="prevStep()" id="prevBtn">
+                        <i class="fas fa-arrow-left"></i> 이전
+                    </button>
+                    <button class="btn btn-outline" onclick="improveComment()" id="improveBtn">
+                        <i class="fas fa-magic"></i> AI 개선
+                    </button>
+                </div>
+                <button class="btn btn-primary" onclick="nextStep()" id="nextBtn">
+                    다음 <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Comments List -->
+        <div class="comments-list" id="commentsList">
+            <!-- Existing comments will be added here -->
+        </div>
+    </div>
+</div>
+
+    <script>
+        // 댓글 작성 단계별 데이터
+        const steps = [
+            {
+                question: "이 포스트에서 가장 인상 깊었던 부분은 무엇인가요?",
+                context: "구체적인 수치나 결과, 인사이트 등에 대해 언급해보세요.",
+                suggestions: [
+                    "GPT-4를 활용한 고객 서비스 자동화의 성과가 인상적입니다.",
+                    "95%의 정확도는 매우 놀라운 결과네요.",
+                    "인간의 감독이 여전히 중요하다는 점이 인상깊습니다."
+                ]
+            },
+            {
+                question: "비슷한 경험이나 의견을 공유해주세요.",
+                context: "본인의 실제 경험이나 관찰한 사례를 공유하면 더욱 좋습니다.",
+                suggestions: [
+                    "저희 팀에서도 ChatGPT를 활용해 고객 응대를 개선했습니다.",
+                    "AI 도입 초기에 비슷한 어려움을 겪었는데...",
+                    "다른 산업에서도 비슷한 성과를 본 사례가 있습니다."
+                ]
+            },
+            {
+                question: "어떤 제안이나 질문을 하고 싶으신가요?",
+                context: "건설적인 제안이나 구체적인 질문을 통해 대화를 이어가보세요.",
+                suggestions: [
+                    "감성 분석을 추가하면 더 좋은 결과가 있을 것 같습니다.",
+                    "Fine-tuning 과정에 대해 더 자세히 알고 싶습니다.",
+                    "다른 언어에서도 비슷한 성과가 있었나요?"
+                ]
+            }
+        ];
+
+        // 상태 관리
+        let currentStep = 0;
+        let answers = ['', '', ''];
+        let draftTimeoutId = null;
+
+        // 댓글 에디터 표시
+        function showCommentEditor() {
+            document.getElementById('commentEditor').style.display = 'block';
+            updateEditorContent();
+            // 저장된 드래프트 불러오기
+            loadDraft();
+        }
+
+        // 에디터 콘텐츠 업데이트
+        function updateEditorContent() {
+            document.getElementById('currentQuestion').textContent = steps[currentStep].question;
+            document.getElementById('currentContext').textContent = steps[currentStep].context;
+            updateSuggestions();
+            updateStepIndicator();
+            updateNavigationButtons();
+        }
+
+        // AI 제안 업데이트
+        function updateSuggestions() {
+            const container = document.getElementById('suggestionChips');
+            container.innerHTML = '';
+            steps[currentStep].suggestions.forEach((suggestion) => {
+                const chip = document.createElement('div');
+                chip.className = 'suggestion-chip';
+                chip.textContent = suggestion;
+                chip.onclick = () => applySuggestion(suggestion);
+                container.appendChild(chip);
+            });
+        }
+
+        // 단계 표시 업데이트
+        function updateStepIndicator() {
+            const stepsElements = document.querySelectorAll('.step');
+            stepsElements.forEach((step, index) => {
+                if (index === currentStep) {
+                    step.classList.add('active');
+                } else {
+                    step.classList.remove('active');
+                }
+            });
+        }
+
+        // 네비게이션 버튼 업데이트
+        function updateNavigationButtons() {
+            document.getElementById('prevBtn').style.display = currentStep === 0 ? 'none' : 'inline-flex';
+            document.getElementById('nextBtn').textContent = currentStep === steps.length - 1 ? '댓글 게시' : '다음';
+        }
+
+        // 제안 적용
+        function applySuggestion(suggestion) {
+            const textarea = document.getElementById('commentInput');
+            textarea.value = suggestion;
+            updateCharacterCount();
+        }
+
+        // 이전 단계로 이동
+        function prevStep() {
+            if (currentStep > 0) {
+                saveDraft();
+                currentStep--;
+                updateEditorContent();
+                document.getElementById('commentInput').value = answers[currentStep];
+            }
+        }
+
+        // 다음 단계로 이동
+        function nextStep() {
+            const input = document.getElementById('commentInput').value.trim();
+            if (!input) {
+                alert('답변을 입력해주세요.');
+                return;
+            }
+            answers[currentStep] = input;
+            saveDraft();
+            if (currentStep === steps.length - 1) {
+                submitComment();
+            } else {
+                currentStep++;
+                updateEditorContent();
+                document.getElementById('commentInput').value = answers[currentStep];
+            }
+        }
+
+        // AI 개선 호출
+        function improveComment() {
+            const input = document.getElementById('commentInput').value.trim();
+            if (!input) {
+                alert('먼저 답변을 입력해주세요.');
+                return;
+            }
+            // 간단한 개선 논리 (실제 AI API 호출 가능)
+            const improvedText = `${input} (AI로 개선되었습니다)`;
+            document.getElementById('commentInput').value = improvedText;
+            updateCharacterCount();
+            showNotification('답변이 AI로 개선되었습니다.', 'success');
+        }
+
+        // 댓글 제출
+        function submitComment() {
+            const commentsList = document.getElementById('commentsList');
+            const comment = document.createElement('div');
+            comment.className = 'comment';
+            comment.innerHTML = `
+                <div class="comment-header">
+                    <div class="avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+            
+                </div>
+                <div class="comment-text">${answers.join(' ')}</div>
+            `;
+            commentsList.prepend(comment);
+            resetEditor();
+            showNotification('댓글이 성공적으로 게시되었습니다.', 'success');
+        }
+
+        // 에디터 리셋
+        function resetEditor() {
+            currentStep = 0;
+            answers = ['', '', ''];
+            document.getElementById('commentEditor').style.display = 'none';
+            document.getElementById('commentInput').value = '';
+            saveDraft(); // 드래프트 초기화
+        }
+
+        // 글자 수 업데이트
+        function updateCharacterCount() {
+            const textarea = document.getElementById('commentInput');
+            const charCount = textarea.value.length;
+            const charCountElement = document.querySelector('.char-count');
+            charCountElement.textContent = `${charCount}/1000`;
+            if (charCount > 1000) {
+                charCountElement.style.color = '#b42318';
+            } else {
+                charCountElement.style.color = '#666';
+            }
+        }
+
+        // 드래프트 저장
+        function saveDraft() {
+            clearTimeout(draftTimeoutId);
+            draftTimeoutId = setTimeout(() => {
+                localStorage.setItem('commentDraft', JSON.stringify(answers));
+            }, 500);
+        }
+
+        // 드래프트 로드
+        function loadDraft() {
+            const savedDraft = localStorage.getItem('commentDraft');
+            if (savedDraft) {
+                answers = JSON.parse(savedDraft);
+                document.getElementById('commentInput').value = answers[currentStep];
+                updateCharacterCount();
+            }
+        }
+
+        // 알림 표시
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+                ${message}
+            `;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 3000);
+        }
+
+        // 초기화
+        document.getElementById('commentInput').addEventListener('input', updateCharacterCount);
+    </script>
+
+
+    <!-- Video Modal -->
+    <div class="modal" id="videoModal">
+        <button class="modal-close" id="closeVideo">&times;</button>
+        <div class="modal-content">
+            <div class="video-container">
+                <video id="demoVideo" controls>
+                    <source src="demo.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Store user inputs
+        let userAnswers = {
+            step1: '',
+            step2: '',
+            step3: ''
+        };
+
+        // Get DOM elements
+        const demoSteps = document.querySelectorAll('.demo-step');
+        const demoInputs = document.querySelectorAll('.demo-input');
+        const previewSection = document.getElementById('previewSection');
+        const previewContent = document.getElementById('previewContent');
+        const editButton = document.getElementById('editComment');
+        const postButton = document.getElementById('postComment');
+
+        // Video modal elements
+        const videoModal = document.getElementById('videoModal');
+        const openVideoBtn = document.getElementById('openVideo');
+        const closeVideoBtn = document.getElementById('closeVideo');
+        const demoVideo = document.getElementById('demoVideo');
+
+        // Handle input progression
+        demoInputs.forEach(input => {
+            input.addEventListener('keyup', (e) => {
+                if (e.key === 'Enter' && input.value.trim()) {
+                    const currentStep = parseInt(input.dataset.step);
+                    userAnswers[`step${currentStep}`] = input.value.trim();
+
+                    if (currentStep < 3) {
+                        // Move to next step
+                        demoSteps[currentStep].classList.remove('active');
+                        demoSteps[currentStep].classList.add('completed');
+                        demoSteps[currentStep].nextElementSibling.classList.add('active');
+                        demoInputs[currentStep].disabled = false;
+                        demoInputs[currentStep].focus();
+                    } else {
+                        // Show preview
+                        showPreview();
+                    }
+                }
+            });
+        });
+
+        // Generate and show preview
+        function showPreview() {
+            const combinedComment = `Based on the post, ${userAnswers.step1}
+
+From my experience, ${userAnswers.step2}
+
+${userAnswers.step3}`;
+
+            previewContent.textContent = combinedComment;
+            previewSection.classList.add('active');
+        }
+
+        // Edit comment
+        editButton.addEventListener('click', () => {
+            previewSection.classList.remove('active');
+            demoInputs[0].focus();
+        });
+
+        // Post comment (simulation)
+        postButton.addEventListener('click', () => {
+            alert('Comment posted successfully!');
+            // Reset form
+            demoInputs.forEach(input => {
+                input.value = '';
+                input.disabled = true;
+            });
+            demoInputs[0].disabled = false;
+            previewSection.classList.remove('active');
+            userAnswers = { step1: '', step2: '', step3: '' };
+        });
+
+        // Video modal handling
+        openVideoBtn.addEventListener('click', () => {
+            videoModal.classList.add('active');
+        });
+
+        closeVideoBtn.addEventListener('click', () => {
+            videoModal.classList.remove('active');
+            demoVideo.pause();
+        });
+
+        // Close modal on outside click
+        videoModal.addEventListener('click', (e) => {
+            if (e.target === videoModal) {
+                videoModal.classList.remove('active');
+                demoVideo.pause();
+            }
+        });
+    </script>
+
+    <!-- Analytics Dashboard -->
+<section class="analytics-section">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Impact Dashboard</h2>
+            <p class="section-subtitle">Track how AI is enhancing your communication</p>
+        </div>
+
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-icon">
+                    <i class="fas fa-comment-dots"></i>
+                </div>
+                <div class="metric-number">15,234</div>
+                <div class="metric-label">Comments Created</div>
+                <div class="metric-trend">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>23% vs last month</span>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-icon">
+                    <i class="fas fa-heart"></i>
+                </div>
+                <div class="metric-number">92%</div>
+                <div class="metric-label">Positive Feedback</div>
+                <div class="metric-trend">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>12% improvement</span>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="metric-number">2.5x</div>
+                <div class="metric-label">Faster Response Time</div>
+                <div class="metric-trend positive">
+                    <i class="fas fa-check"></i>
+                    <span>Consistently faster</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <div class="chart-header">
+                <h3>Engagement Trends</h3>
+                <select class="chart-period">
+                    <option>Last 30 days</option>
+                    <option>Last 90 days</option>
+                    <option>This year</option>
+                </select>
+            </div>
+            <div class="chart">
+                <!-- Placeholder for chart - would be implemented with a charting library -->
+                <div class="chart-placeholder">
+                    <img src="/api/placeholder/800/300" alt="Engagement Chart" />
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- User Testimonials -->
+<section class="testimonials-section">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">User Stories</h2>
+            <p class="section-subtitle">See how thoughtful.ai is transforming online conversations</p>
+        </div>
+
+        <div class="testimonials-grid">
+            <div class="testimonial-card">
+                <div class="testimonial-content">
+                    <i class="fas fa-quote-left"></i>
+                    <p>The guided approach helps me structure my thoughts better. Now my comments are more meaningful and get much more engagement.</p>
+                </div>
+                <div class="testimonial-author">
+                    <div class="author-image">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <div class="author-info">
+                        <h4>Sarah Chen</h4>
+                        <p>Tech Community Manager</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="testimonial-card">
+                <div class="testimonial-content">
+                    <i class="fas fa-quote-left"></i>
+                    <p>As a content creator, this tool has become essential. The AI suggestions help me engage with my audience more effectively.</p>
+                </div>
+                <div class="testimonial-author">
+                    <div class="author-image">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <div class="author-info">
+                        <h4>David Kim</h4>
+                        <p>Digital Creator</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="testimonial-card">
+                <div class="testimonial-content">
+                    <i class="fas fa-quote-left"></i>
+                    <p>The analytics dashboard helps me understand how my comments are performing and where I can improve.</p>
+                </div>
+                <div class="testimonial-author">
+                    <div class="author-image">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <div class="author-info">
+                        <h4>Emily Wang</h4>
+                        <p>Community Moderator</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>
